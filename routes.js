@@ -16,24 +16,24 @@ routes.get("/cartitems", (req, res) => {
 });
 
 routes.get("/cart-items", (req, res) => {
-	let filteredCartItems = cartItems;
-	const maxPrice = parseInt(req.query.maxPrice);
-	const prefix = req.query.prefix;
-	const pageSize = parseInt(req.query.pageSize);
-	if (maxPrice) {
-		filteredCartItems = filteredCartItems.filter(
-			(item) => item.price < maxPrice
-		);
+	if (req.query.maxPrice) {
+		let filteredArray = items.filter((item) => {
+			return item.price <= parseFloat(req.query.maxPrice);
+		});
+		res.json(filteredArray);
+	} else if (req.query.prefix) {
+		filteredArray = items.filter((item) => {
+			let currentItem = item.product.toLowerCase();
+			return currentItem.startsWith(req.query.prefix.toLowerCase());
+		});
+		res.json(filteredArray);
+	} else if (req.query.pageSize) {
+		let results = items.slice(0, parseInt(req.query.pageSize));
+		res.json(results);
+	} else {
+		res.status(200);
+		res.json(items);
 	}
-	if (prefix) {
-		filteredCartItems = filteredCartItems.filter((item) =>
-			item.product.includes(prefix)
-		);
-	}
-	if (pageSize) {
-		filteredCartItems = filteredCartItems.slice(0, pageSize);
-	}
-	res.json(filteredCartItems);
 });
 
 routes.post("/cartitems", (req, res) => {
