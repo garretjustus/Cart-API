@@ -1,4 +1,5 @@
 const express = require("express");
+const e = require("express");
 const routes = express.Router();
 
 const cartitems = [
@@ -36,6 +37,20 @@ routes.get("/cart-items", (req, res) => {
 	}
 });
 
+routes.get("/cartitems/:id", (req, res) => {
+	let id = parseInt(req.params.id);
+	let found = items.find((item) => {
+		return item.id === id;
+	});
+	if (found) {
+		res.json(found);
+		res.status(200);
+	} else {
+		res.status(404);
+		res.send(`ID: ${id} not found`);
+	}
+});
+
 routes.post("/cartitems", (req, res) => {
 	const item = req.body;
 	item.id = nextId++;
@@ -45,21 +60,25 @@ routes.post("/cartitems", (req, res) => {
 });
 
 routes.put("/cartitems/:id", (req, res) => {
+	let id = parseInt(req.params.id);
+	let index = items.findIndex((item) => {
+		return item.id === id;
+	});
+	items[index] = req.body;
+	items[index].id = id;
 	res.status(200);
-	res.json(item);
+	res.json(items[index]);
 });
 
 routes.delete("/cartitems/:id", (req, res) => {
-	const id = parseInt(req.params.id);
-	const index = cartitems.findIndex((item) => item.id === id);
-	if (index !== -1) {
-		cartitems.splice(index, 1);
-	} else {
-		res.status(404);
-		res.send("id not found");
-	}
+	let id = req.params.id;
+	let index = items.findIndex((item) => {
+		item.id === id;
+		return item.id === id;
+	});
+	items.splice(index, 1);
 	res.status(204);
-	res.send();
+	res.json();
 });
 
 module.exports = routes;
